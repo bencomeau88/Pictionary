@@ -2,39 +2,7 @@
 <title>Pictionary</title>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-
-<!-- CSS -->
-<style>
-* {
-    box-sizing: border-box;
-}
-
-body {
-    color: #1E2835;
-    background-color: #F8F8F8;
-    font-size: 1.5em;
-}
-
-h1 {
-    background-color: #9ABBFF;
-    margin:  0 0 20px 0;
-    padding: 20px;
-    text-align: center;
-}
-
-#top-message {
-    text-align: center;
-    padding: 10px;
-}
-
-canvas {
-    width: 800px;
-    height: 600px;
-    border: 1px #C7CACD solid;
-    display: block;
-    margin: 0 auto;
-}
-</style>
+<link rel="stylesheet" href="./style.css">
 
 <!-- JS -->
 <script src="//code.jquery.com/jquery-2.1.0.js"></script>
@@ -43,17 +11,25 @@ canvas {
 <script src="main.js"></script>
 
 <div id="main">
-    <h1>Pictionary</h1>
+    <h1 class='title'>Pictionary</h1>
     <div id="top-message">
-<div class="nicknames"></div>
+      <div class="nicknamesContainer">
+        <h2 class='onlineHeader'>Who's Online?</h2>
+        <div class="nicknames">
+
+        </div>
+      </div>
     <div id="guess" style="display: block">
         Make a guess: <input type="text">
     </div>
     <div class="messages">
   </div>
+  <div class="allThings">
   <div class="wordChoice"></div>
-    <div id="guesses"></div>
-
+    <div id="guesses">
+    </div>
+    <button type="button" name="Correct" class="correctBttn"> Correct Guess!</button>
+</div>
 </div>
     <canvas id="canvas"></canvas>
 

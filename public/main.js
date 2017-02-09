@@ -1,4 +1,9 @@
+// COMMIT MORE OFTEN!!
 $(document).ready(function() {
+
+  String.prototype.capitalize = function(){
+        return this.charAt(0).toUpperCase() + this.slice(1);
+      }
 
 var pictionary = function() {
   var socket = io();
@@ -11,6 +16,28 @@ var pictionary = function() {
                          6, 0, 2 * Math.PI);
         context.fill();
     };
+
+    canvas = $('canvas');
+    context = canvas[0].getContext('2d');
+    canvas[0].width = canvas[0].offsetWidth;
+    canvas[0].height = canvas[0].offsetHeight;
+
+    canvas.on('mousedown', function(){
+      drawing = true;
+    });
+    canvas.on('mouseup', function(){
+      drawing = false ;
+    });
+    canvas.on('mousemove', function(event) {
+      if(drawing){
+        var offset = canvas.offset();
+        var position = {x: event.pageX - offset.left,
+                        y: event.pageY - offset.top};
+        // emitting a 'draw' event whne you use the mousemove()
+        socket.emit('draw', position);
+        draw(position);
+        }
+    });
 
     var guessBox;
 
@@ -25,7 +52,7 @@ var onKeyDown = function(event) {
 };
 
 var nickname = prompt('What is your nickname');
-$('.nicknames').html(nickname);
+// $('.nicknames').append(nickname);
 socket.emit('userReg', nickname);
 
 var displayGuess = function(guess){
@@ -57,7 +84,7 @@ var timeout = function(message){
   setTimeout(function(){
     nicknames.remove();
   }, 5000);
-}
+};
 // how to display this message on "disconnect" EVT.
 var winMessage = function(win){
   alert(win);
@@ -69,10 +96,11 @@ var addMessage = function(message){
 
 var logEvents = function(nickname){
   nicknames.text(nickname);
-}
+  // possibly add a timeout(); or try doing a time stamp
+};
 
 var usersOnline = function(nicknames){
-  $('.nicknames').html(nicknames.map(function(nickname){return $('<div>' + nickname + '</div>')}))
+  $('.nicknames').html(nicknames.map(function(nickname){return $('<div class="userName">' + "<img src='./userThumb.svg' width='100px' height='100px'>" + '<div class=user>' + nickname.capitalize() + '</div>' + '</div>')}))
 };
 
 var newWord = function(){
@@ -84,41 +112,30 @@ var newWord = function(){
 var drawer = function(){
   $('#guess').hide();
   $('.messages').text('you are the drawer!');
-}
+};
 var guesser = function(){
   $('.messages').text('you are the guesser!');
 };
+
+$('.correctBttn').on('click', function(){
+  socket.emit('gameOver');
+});
+
+var showBttn = function(){
+  $('.correctBttn').show();
+}
+
 guessBox = $('#guess input');
 guessBox.on('keydown', onKeyDown);
 
-    canvas = $('canvas');
-    context = canvas[0].getContext('2d');
-    canvas[0].width = canvas[0].offsetWidth;
-    canvas[0].height = canvas[0].offsetHeight;
-
-    canvas.on('mousedown', function(){
-      drawing = true;
-    });
-    canvas.on('mouseup', function(){
-      drawing = false ;
-    });
-    canvas.on('mousemove', function(event) {
-      if(drawing){
-        var offset = canvas.offset();
-        var position = {x: event.pageX - offset.left,
-                        y: event.pageY - offset.top};
-        // emitting a 'draw' event whne you use the mousemove()
-        socket.emit('draw', position);
-        draw(position);
-        }
-    });
-
+  socket.on('displayBttn', showBttn);
     socket.on('guesser', guesser);
     socket.on('drawer', drawer);
     socket.on('newWord', newWord);
     socket.on('userList', usersOnline)
     socket.on('prompt', winMessage);
-    socket.on('userReg', logEvents, timeout);
+    socket.on('userReg', logEvents);
+    // socket.on('userReg', timeout);
     socket.on('message', addMessage);
     socket.on('guess', displayGuess);
     socket.on('draw', draw);

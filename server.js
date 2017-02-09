@@ -16,17 +16,21 @@ io.on('connection', function(socket){
   });
   socket.on('disconnect', function(){
     socket.broadcast.emit('message', "your opponent has just logged out");
+    var indexUser = users.indexOf(socket.nickname);
+    users.splice(indexUser, 1);
     if(users.length < 2){
-    socket.broadcast.emit('prompt', "You Win!");
-  };
+    socket.broadcast.emit('prompt', "GAME OVER. Find a new opponent");
+      };
   });
   socket.on('userReg', function(nickname){
     socket.nickname = nickname;
     users.push(nickname);
+    console.log(users.length);
 
     if(users.length === 1 || typeof io.sockets.adapter.rooms['drawer'] === 'undefined') {
       socket.join('drawer');
       io.in('drawer').emit('drawer', socket.nickname);
+      io.in('drawer').emit('displayBttn');
       socket.broadcast.emit('message', socket.nickname + " is the drawer");
       io.in('drawer').emit('newWord');
     }
@@ -45,6 +49,9 @@ socket.on('draw', function(position){
 });
 socket.on('guess', function(guess){
   socket.broadcast.emit('guess', guess);
+});
+socket.on('gameOver', function(){
+  io.emit('message', "your opponent has guessed correctly! The game is over");
 });
 
 });
